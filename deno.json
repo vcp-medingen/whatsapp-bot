@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  },
+  "imports": {
+    "@kingsword09/ts-qrcode-terminal": "jsr:@kingsword09/ts-qrcode-terminal@^1.0.1",
+    "@std/assert": "jsr:@std/assert@1",
+    "mongoose": "npm:mongoose@^8.8.1",
+    "whatsapp-web.js": "npm:whatsapp-web.js@^1.26.0",
+    "wwebjs-mongo": "npm:wwebjs-mongo@^1.1.0"
+  },
+  "nodeModulesDir": "auto"
+}
