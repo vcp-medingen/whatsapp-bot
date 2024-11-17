@@ -53,30 +53,35 @@ Deno.serve(async (req) => {
   if (req.method == "GET") {
     const url = new URL(req.url);
     const api_key = url.searchParams.get("api_key");
+    const pin : boolean = url.searchParams.get("pin") === "true";
     if (api_key !== Deno.env.get("API_KEY")) {
       return new Response(JSON.stringify({status: "error", error: "Unauthorized"}), {status: 401});
     }
     if (url.pathname == "/send") {
       const message = url.searchParams.get("message");
       const media_url = url.searchParams.get("media_url");
+      let sent_message: Message | undefined = undefined;
       if (media_url) {
         const media: MessageMedia = await MessageMedia.fromUrl(media_url, {
           unsafeMime: true,
         });
         if (message) {
-          await chat.sendMessage(message, {
+          sent_message = await chat.sendMessage(message, {
             media: media,
             linkPreview: false,
           });
+          if (pin) await sent_message?.pin(29*24*60*60);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         } else {
-          await chat.sendMessage(media);
+          sent_message = await chat.sendMessage(media);
+          if (pin) await sent_message?.pin(29*24*60*60);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         }
       } else if (message) {
-        await chat.sendMessage(message, {
+        sent_message = await chat.sendMessage(message, {
           linkPreview: false,
         });
+        if (pin) await sent_message?.pin(29*24*60*60);
         return new Response(JSON.stringify({status: "success"}), {status: 200});
       }
     } else if (url.pathname == "/change-title") {
