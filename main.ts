@@ -1,4 +1,4 @@
-import { Client, RemoteAuth, Chat, MessageMedia } from "whatsapp-web.js"
+import { Client, RemoteAuth, Chat, MessageMedia, Message } from "whatsapp-web.js"
 import { MongoStore } from "wwebjs-mongo";
 import * as mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
@@ -91,11 +91,21 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({status: "success"}), {status: 200});
 
       }
+    } else if (url.pathname == "/change-description") {
+        const description = url.searchParams.get("description");
+        if (description) {
+            if(await chat.setDescription(description)){
+              return new Response(JSON.stringify({status: "success"}), {status: 200});
+            } else {
+              return new Response(JSON.stringify({status: "error", error: "Failed to set description"}), {status: 500});
+            }
+        }
     }
     return new Response(JSON.stringify({status: "error", error: "Invalid request"}), {status: 400});
   }
 }, {
   port: 80
 });
+
 
 client.initialize()
