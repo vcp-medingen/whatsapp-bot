@@ -81,7 +81,11 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({status: "error", error: "file_name is required"}), {status: 400});
       }
       if (media_url && file_name) {
-        const response = await fetch(media_url);
+        const response = await fetch(media_url, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+            }
+        });
         const file = await Deno.open("/tmp/" + file_name, {write: true, create: true});
         await response.body?.pipeTo(file.writable);
         file.close();
