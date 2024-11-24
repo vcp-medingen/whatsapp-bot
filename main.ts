@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
 import { wrapFetch } from "jsr:@jd1378/another-cookiejar@^5.0.7";
 import "jsr:@std/dotenv/load";
+import { Buffer } from "jsr:@std/io"
 
 const mongodb_uri = Deno.env.get("MONGODB_URI");
 const fetch = wrapFetch()
@@ -83,13 +84,10 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({status: "error", error: "file_name is required"}), {status: 400});
       }
       if (media_url && file_name) {
-        const response = await fetch(media_url, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-            }
-        });
+        const response = await fetch(media_url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3' } });
+        const blob = await response.blob();
         const file = await Deno.open("/tmp/" + file_name, {write: true, create: true});
-        await response.body?.pipeTo(file.writable);
+        await file.write(new Buffer(await blob.arrayBuffer()).bytes());
         file.close();
         const media = MessageMedia.fromFilePath("/tmp/" + file_name);
         let sent_message: Message | undefined = undefined;
