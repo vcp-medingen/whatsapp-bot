@@ -46,6 +46,11 @@ client.on("ready", async () => {
   chat = await client.getChatById(Deno.env.get("CHAT_ID")!);
 })
 
+client.on('remote_session_saved', () => {
+    console.log('Remote session saved in MongoDB. ');
+});
+
+
 Deno.serve(async (req) => {
   if (!chat) {
     return new Response(JSON.stringify({status: "error", error: "Client not ready"}), {status: 500});
