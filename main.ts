@@ -52,6 +52,7 @@ client.on("qr", (qr: string) => {
 
 client.on("ready", async () => {
   console.log("Client is ready!")
+  console.log(mongoose.connection.readyState);
   chat = await client.getChatById(Deno.env.get("CHAT_ID")!);
 })
 
