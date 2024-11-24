@@ -1,6 +1,6 @@
 import { Client, RemoteAuth, Chat, MessageMedia, Message } from "whatsapp-web.js"
 import { MongoStore } from "wwebjs-mongo";
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
 import "jsr:@std/dotenv/load";
 
