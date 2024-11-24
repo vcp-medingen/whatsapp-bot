@@ -97,12 +97,10 @@ Deno.serve(async (req) => {
             linkPreview: false,
           });
           if (pin) await sent_message?.pin(29*24*60*60);
-          await Deno.remove("/tmp/" + file_name);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         } else {
           sent_message = await chat.sendMessage(media);
           if (pin) await sent_message?.pin(29*24*60*60);
-          await Deno.remove("/tmp/" + file_name);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         }
       } else if (message) {
