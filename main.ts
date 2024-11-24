@@ -1,6 +1,6 @@
 import { Client, RemoteAuth, Chat, MessageMedia, Message } from "whatsapp-web.js"
 import { MongoStore } from "wwebjs-mongo";
-import mongoose from "mongoose";
+import * as mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
 import "jsr:@std/dotenv/load";
 
@@ -35,14 +35,15 @@ mongoose.connection.on("error", (err: Error) => {
 let chat: Chat | undefined = undefined;
 
 const client = new Client({
-  puppeteer: {
-    headless: true,
-  },
   authStrategy: new RemoteAuth({
-    store: new MongoStore(mongoose),
+    store: new MongoStore(
+        {
+          mongoose: mongoose
+        }
+    ),
     backupSyncIntervalMs: 300000,
-  }),
-})
+  })
+});
 
 client.on("qr", (qr: string) => {
   console.log("QR RECEIVED", qr)
