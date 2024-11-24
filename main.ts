@@ -1,6 +1,6 @@
 import { Client, RemoteAuth, Chat, MessageMedia, Message } from "whatsapp-web.js"
 import { MongoStore } from "wwebjs-mongo";
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
 import "jsr:@std/dotenv/load";
 
@@ -21,7 +21,16 @@ if (!Deno.env.get("API_KEY")) {
     Deno.exit(1);
 }
 
-await mongoose.connect(Deno.env.get("MONGODB_URI")!.toString());
+console.log("Connecting to URI ", Deno.env.get("MONGODB_URI"));
+await mongoose.connect(Deno.env.get("MONGODB_URI")!.toString()).catch((err: Error) => {
+    console.error("Failed to connect to MongoDB", err);
+    Deno.exit(1);
+});
+
+mongoose.connection.on("error", (err: Error) => {
+    console.error("MongoDB connection error", err);
+    Deno.exit(1);
+});
 
 let chat: Chat | undefined = undefined;
 
@@ -35,7 +44,7 @@ const client = new Client({
   }),
 })
 
-client.on("qr", qr => {
+client.on("qr", (qr: string) => {
   console.log("QR RECEIVED", qr)
   generate(qr, { small: true, qrErrorCorrectLevel: QRErrorCorrectLevel.H })
       .then(console.log)
