@@ -37,7 +37,7 @@ const client = new Client({
 
 client.on("qr", qr => {
   console.log("QR RECEIVED", qr)
-  generate(qr, { small: true, white: "⬜️", black: "⬛️", qrErrorCorrectLevel: QRErrorCorrectLevel.H })
+  generate(qr, { small: true, qrErrorCorrectLevel: QRErrorCorrectLevel.H })
       .then(console.log)
 })
 
@@ -66,10 +66,10 @@ Deno.serve(async (req) => {
       }
       if (media_url && file_name) {
         const response = await fetch(media_url);
-        const buffer = await response.arrayBuffer();
-        const buffer_b64 = Buffer.from(buffer).toString("base64");
-        const mime_type = response.headers.get("content-type");
-        const media = new MessageMedia(mime_type!, buffer_b64, file_name);
+        const file = await Deno.open("/tmp/" + file_name, {write: true, create: true});
+        await response.body?.pipeTo(file.writable);
+        file.close();
+        const media = MessageMedia.fromFilePath("/tmp/" + file_name);
         let sent_message: Message | undefined = undefined;
         if (message) {
           sent_message = await chat.sendMessage(message, {
@@ -77,10 +77,12 @@ Deno.serve(async (req) => {
             linkPreview: false,
           });
           if (pin) await sent_message?.pin(29*24*60*60);
+          await Deno.remove("/tmp/" + file_name);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         } else {
           sent_message = await chat.sendMessage(media);
           if (pin) await sent_message?.pin(29*24*60*60);
+          await Deno.remove("/tmp/" + file_name);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         }
       } else if (message) {
