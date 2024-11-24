@@ -2,9 +2,11 @@ import { Client, RemoteAuth, Chat, MessageMedia, Message } from "whatsapp-web.js
 import { MongoStore } from "wwebjs-mongo";
 import mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
+import { wrapFetch } from "jsr:@jd1378/another-cookiejar@^5.0.7";
 import "jsr:@std/dotenv/load";
 
 const mongodb_uri = Deno.env.get("MONGODB_URI");
+const fetch = wrapFetch()
 
 if (!mongodb_uri) {
     console.error("MONGODB_URI is required");
