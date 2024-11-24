@@ -60,11 +60,17 @@ Deno.serve(async (req) => {
     if (url.pathname == "/send") {
       const message = url.searchParams.get("message");
       const media_url = url.searchParams.get("media_url");
-      let sent_message: Message | undefined = undefined;
-      if (media_url) {
-        const media: MessageMedia = await MessageMedia.fromUrl(media_url, {
-          unsafeMime: true,
-        });
+      const file_name = url.searchParams.get("file_name");
+      if (media_url && !file_name) {
+        return new Response(JSON.stringify({status: "error", error: "file_name is required"}), {status: 400});
+      }
+      if (media_url && file_name) {
+        const response = await fetch(media_url);
+        const buffer = await response.arrayBuffer();
+        const buffer_b64 = Buffer.from(buffer).toString("base64");
+        const mime_type = response.headers.get("content-type");
+        const media = new MessageMedia(mime_type!, buffer_b64, file_name);
+        let sent_message: Message | undefined = undefined;
         if (message) {
           sent_message = await chat.sendMessage(message, {
             media: media,
@@ -78,7 +84,7 @@ Deno.serve(async (req) => {
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         }
       } else if (message) {
-        sent_message = await chat.sendMessage(message, {
+        const sent_message = await chat.sendMessage(message, {
           linkPreview: false,
         });
         if (pin) await sent_message?.pin(29*24*60*60);
