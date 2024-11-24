@@ -27,10 +27,6 @@ await mongoose.connect(Deno.env.get("MONGODB_URI")!.toString()).catch((err: Erro
     Deno.exit(1);
 });
 
-mongoose.connection.on("error", (err: any) => {
-    console.error("MongoDB connection error: ", err);
-});
-
 let chat: Chat | undefined = undefined;
 
 const client = new Client({
