@@ -1,5 +1,4 @@
-import { Client, RemoteAuth, Chat, MessageMedia, Message } from "whatsapp-web.js"
-import { MongoStore } from "wwebjs-mongo";
+import { Client, LocalAuth, Chat, MessageMedia, Message } from "whatsapp-web.js"
 import mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
 import { wrapFetch } from "jsr:@jd1378/another-cookiejar@^5.0.7";
@@ -39,14 +38,20 @@ let prod_chat: Chat | undefined = undefined;
 let test_chat: Chat | undefined = undefined;
 
 const client = new Client({
-  authStrategy: new RemoteAuth({
-    store: new MongoStore(
-        {
-          mongoose: mongoose
-        }
-    ),
-    backupSyncIntervalMs: 300000,
-  })
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--single-process',
+      '--disable-gpu'
+    ],
+  },
 });
 
 client.on("qr", (qr: string) => {
@@ -55,7 +60,7 @@ client.on("qr", (qr: string) => {
       .then(console.log)
 })
 
-client.on("ready", async () => {
+client.on("ready", async () => {console.log(await client.getChats());
   console.log("Client is ready!")
   console.log(mongoose.connection.readyState);
   prod_chat = await client.getChatById(Deno.env.get("CHAT_ID")!);
@@ -68,7 +73,7 @@ client.on('remote_session_saved', () => {
 
 
 Deno.serve(async (req) => {
-  if (!chat) {
+  if (!prod_chat) {
     return new Response(JSON.stringify({status: "error", error: "Client not ready"}), {status: 500});
   }
   if (req.method == "GET") {
