@@ -1,17 +1,11 @@
 import { Client, LocalAuth, Chat, MessageMedia, Message } from "whatsapp-web.js"
-import mongoose from "mongoose";
 import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-terminal";
 import { wrapFetch } from "jsr:@jd1378/another-cookiejar@^5.0.7";
 import "jsr:@std/dotenv/load";
 import { Buffer } from "jsr:@std/io"
 
-const mongodb_uri = Deno.env.get("MONGODB_URI");
 const fetch = wrapFetch()
 
-if (!mongodb_uri) {
-    console.error("MONGODB_URI is required");
-    Deno.exit(1);
-}
 
 if (!Deno.env.get("CHAT_ID")) {
     console.error("CHAT_ID is required");
@@ -23,16 +17,6 @@ if (!Deno.env.get("API_KEY")) {
     Deno.exit(1);
 }
 
-console.log("Connecting to URI ", Deno.env.get("MONGODB_URI"));
-await mongoose.connect(Deno.env.get("MONGODB_URI")!.toString()).catch((err: Error) => {
-    console.error("Failed to connect to MongoDB", err);
-    Deno.exit(1);
-});
-
-mongoose.connection.on("error", (err: Error) => {
-    console.error("MongoDB connection error", err);
-    Deno.exit(1);
-});
 
 let prod_chat: Chat | undefined = undefined;
 let test_chat: Chat | undefined = undefined;
@@ -56,14 +40,10 @@ client.on("qr", (qr: string) => {
 
 client.on("ready", async () => {console.log(await client.getChats());
   console.log("Client is ready!")
-  console.log(mongoose.connection.readyState);
   prod_chat = await client.getChatById(Deno.env.get("CHAT_ID")!);
   test_chat = await client.getChatById(Deno.env.get("CHAT_TEST_ID")!);
 })
 
-client.on('remote_session_saved', () => {
-    console.log('Remote session saved in MongoDB. ');
-});
 
 
 Deno.serve(async (req) => {
