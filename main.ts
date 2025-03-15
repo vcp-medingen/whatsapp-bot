@@ -38,7 +38,7 @@ client.on("qr", (qr: string) => {
       .then(console.log)
 })
 
-client.on("ready", async () => {console.log(await client.getChats());
+client.on("ready", async () => {
   console.log("Client is ready!")
   prod_chat = await client.getChatById(Deno.env.get("CHAT_ID")!);
   test_chat = await client.getChatById(Deno.env.get("CHAT_TEST_ID")!);
