@@ -1,16 +1,22 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@jd1378/another-cookiejar@^5.0.7": "5.0.7",
     "jsr:@kingsword09/ts-qrcode-terminal@*": "1.0.1",
     "jsr:@kingsword09/ts-qrcode-terminal@^1.0.1": "1.0.1",
     "jsr:@std/assert@1": "1.0.7",
+    "jsr:@std/bytes@^1.0.2": "1.0.4",
     "jsr:@std/dotenv@*": "0.225.2",
     "jsr:@std/internal@^1.0.5": "1.0.5",
+    "jsr:@std/io@*": "0.225.0",
     "npm:mongoose@^8.8.1": "8.8.1",
-    "npm:whatsapp-web.js@^1.26.0": "1.26.0",
+    "npm:whatsapp-web.js@^1.26.1-alpha.3": "1.26.1-alpha.3",
     "npm:wwebjs-mongo@^1.1.0": "1.1.0"
   },
   "jsr": {
+    "@jd1378/another-cookiejar@5.0.7": {
+      "integrity": "788e22828dd428aaebaedc9acbed6ae7033cc240982a10fcfc34aa72dcf01088"
+    },
     "@kingsword09/ts-qrcode-terminal@1.0.1": {
       "integrity": "178a6d412ed87a8885f1f5fa020aa83599789002a76b887e9d0821fdc7799f49"
     },
@@ -20,11 +26,20 @@
         "jsr:@std/internal"
       ]
     },
+    "@std/bytes@1.0.4": {
+      "integrity": "11a0debe522707c95c7b7ef89b478c13fb1583a7cfb9a85674cd2cc2e3a28abc"
+    },
     "@std/dotenv@0.225.2": {
       "integrity": "e2025dce4de6c7bca21dece8baddd4262b09d5187217e231b033e088e0c4dd23"
     },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    },
+    "@std/io@0.225.0": {
+      "integrity": "c1db7c5e5a231629b32d64b9a53139445b2ca640d828c26bf23e1c55f8c079b3",
+      "dependencies": [
+        "jsr:@std/bytes"
+      ]
     }
   },
   "npm": {
@@ -644,8 +659,8 @@
     "webidl-conversions@7.0.0": {
       "integrity": "sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g=="
     },
-    "whatsapp-web.js@1.26.0": {
-      "integrity": "sha512-JUbpwVmJE427KgYIXju+ycHq65SNnXkAsoWwnEUpyI4E0O45S5aG1stRML7aGJxVb6aycTR+hLrTlEiygsNJug==",
+    "whatsapp-web.js@1.26.1-alpha.3": {
+      "integrity": "sha512-W8RoTf6rZfHJx+JZGWUlsX0mbtZpYnoXzbSmtOtSn+pgTPO70rmdef4J9kuTWi4CRgnLLTQnCzpbDkEMXCUDBw==",
       "dependencies": [
         "@pedroslopez/moduleraid",
         "archiver",
@@ -840,7 +855,7 @@
       "jsr:@kingsword09/ts-qrcode-terminal@^1.0.1",
       "jsr:@std/assert@1",
       "npm:mongoose@^8.8.1",
-      "npm:whatsapp-web.js@^1.26.0",
+      "npm:whatsapp-web.js@^1.26.1-alpha.3",
       "npm:wwebjs-mongo@^1.1.0"
     ]
   }

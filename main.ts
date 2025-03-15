@@ -35,7 +35,8 @@ mongoose.connection.on("error", (err: Error) => {
     Deno.exit(1);
 });
 
-let chat: Chat | undefined = undefined;
+let prod_chat: Chat | undefined = undefined;
+let test_chat: Chat | undefined = undefined;
 
 const client = new Client({
   authStrategy: new RemoteAuth({
@@ -57,7 +58,8 @@ client.on("qr", (qr: string) => {
 client.on("ready", async () => {
   console.log("Client is ready!")
   console.log(mongoose.connection.readyState);
-  chat = await client.getChatById(Deno.env.get("CHAT_ID")!);
+  prod_chat = await client.getChatById(Deno.env.get("CHAT_ID")!);
+  test_chat = await client.getChatById(Deno.env.get("CHAT_TEST_ID")!);
 })
 
 client.on('remote_session_saved', () => {
@@ -73,6 +75,10 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const api_key = url.searchParams.get("api_key");
     const pin : boolean = url.searchParams.get("pin") === "true";
+    let chat = prod_chat;
+    if (url.searchParams.get("test") === "true") {
+      chat = test_chat;
+    }
     if (api_key !== Deno.env.get("API_KEY")) {
       return new Response(JSON.stringify({status: "error", error: "Unauthorized"}), {status: 401});
     }
@@ -96,18 +102,18 @@ Deno.serve(async (req) => {
             media: media,
             linkPreview: false,
           });
-          if (pin) await sent_message?.pin(29*24*60*60);
+          if (pin) await sent_message?.pin(30*24*60*60);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         } else {
           sent_message = await chat.sendMessage(media);
-          if (pin) await sent_message?.pin(29*24*60*60);
+          if (pin) await sent_message?.pin(30*24*60*60);
           return new Response(JSON.stringify({status: "success"}), {status: 200});
         }
       } else if (message) {
         const sent_message = await chat.sendMessage(message, {
           linkPreview: false,
         });
-        if (pin) await sent_message?.pin(29*24*60*60);
+        if (pin) await sent_message?.pin(30*24*60*60);
         return new Response(JSON.stringify({status: "success"}), {status: 200});
       }
     } else if (url.pathname == "/change-title") {
