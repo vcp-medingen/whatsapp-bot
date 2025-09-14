@@ -3,6 +3,7 @@ import { generate, QRErrorCorrectLevel } from "jsr:@kingsword09/ts-qrcode-termin
 import { wrapFetch } from "jsr:@jd1378/another-cookiejar@^5.0.7";
 import "jsr:@std/dotenv/load";
 import { Buffer } from "jsr:@std/io"
+import {ScheduledEvent} from "npm:whatsapp-web.js@1.34.1";
 
 const fetch = wrapFetch()
 
@@ -54,7 +55,7 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const api_key = url.searchParams.get("api_key");
     const pin : boolean = url.searchParams.get("pin") === "true";
-    let chat = prod_chat;
+    let chat: Chat = prod_chat;
     if (url.searchParams.get("test") === "true") {
       chat = test_chat;
     }
@@ -111,6 +112,37 @@ Deno.serve(async (req) => {
               return new Response(JSON.stringify({status: "error", error: "Failed to set description"}), {status: 500});
             }
         }
+    } else if (url.pathname == "/create-event") {
+        const event_name = url.searchParams.get("name");
+        const event_description = url.searchParams.get("description") || "";
+        const event_location = url.searchParams.get("location") || "";
+        const event_start = url.searchParams.get("start");
+        const event_end = url.searchParams.get("end");
+        if (!event_name || !event_start) {
+            return new Response(JSON.stringify({status: "error", error: "name and start are required"}), {status: 400});
+        }
+        const start = new Date(event_start);
+        if (isNaN(start.getTime())) {
+            return new Response(JSON.stringify({status: "error", error: "Invalid start date"}), {status: 400});
+        }
+        let end: Date | undefined = undefined;
+        if (event_end) {
+            end = new Date(event_end);
+            if (isNaN(end.getTime())) {
+                return new Response(JSON.stringify({status: "error", error: "Invalid end date"}), {status: 400});
+            }
+        }
+        const scheduledEvent = new ScheduledEvent(
+            event_name,
+            start,
+            {
+                description: event_description,
+                location: event_location,
+                end: end,
+            }
+        );
+        await chat.sendMessage(scheduledEvent);
+        return new Response(JSON.stringify({status: "success"}), {status: 200});
     }
     return new Response(JSON.stringify({status: "error", error: "Invalid request"}), {status: 400});
   }
