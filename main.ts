@@ -138,7 +138,8 @@ Deno.serve(async (req) => {
             {
                 description: event_description,
                 location: event_location,
-                end: end,
+                endTimeTs: end,
+                callType: "none"
             }
         );
         await chat.sendMessage(scheduledEvent);
