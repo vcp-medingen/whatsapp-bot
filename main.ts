@@ -171,9 +171,7 @@ app.get("/send", async (req, res) => {
 
         try {
             await sock.sendMessage(getJid(req), {
-                document: {
-                    stream: Readable.fromWeb(response.body as ReadableStream),
-                },
+                document: await response.arrayBuffer(),
                 fileName: fileName,
                 caption: message
             });
