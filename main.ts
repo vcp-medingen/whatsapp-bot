@@ -48,7 +48,7 @@ async function startSock() {
             keys: makeCacheableSignalKeyStore(state.keys, logger)
         },
         generateHighQualityLinkPreview: true,
-        cachedGroupMetadata: async (jid) => groupMetadataCache.get(getJid(req)),
+        cachedGroupMetadata: async (jid) => groupMetadataCache.get(jid),
         shouldSyncHistoryMessage: () => false,
         browser: Browsers.macOS("Desktop")
     });
@@ -112,7 +112,6 @@ app.get("/send", async (req, res) => {
     const message: string | undefined = req.query.message;
     const mediaUrl: string | undefined = req.query.media_url;
     const fileName: string | undefined = req.query.file_name;
-    const pin: boolean = req.query.pin;
 
 
     if (!message && !mediaUrl) {
@@ -133,19 +132,10 @@ app.get("/send", async (req, res) => {
 
     if (!mediaUrl) {
         try {
-            const chatMessage = await sock.sendMessage(getJid(req), {
+            console.log(message);
+            await sock.sendMessage("120363370055424747@g.us", {
                 text: message
             });
-
-            if (pin) {
-                console.log("tried to pin")
-                await sock.sendMessage(getJid(req),
-                    {
-                        pin: chatMessage.key,
-                        type: 1,
-                        time: 30
-                    });
-            }
         } catch (e) {
             res.code(400);
             return {
