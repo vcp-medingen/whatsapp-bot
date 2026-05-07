@@ -159,7 +159,7 @@ app.get("/send", async (req, res) => {
         }
 
         // Fetch file as readable stream
-        const response = await fetch(mediaUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3' } });
+        const response = await fetch(mediaUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3' } , redirect: "follow"});
 
         if (!response.ok || !response.body) {
             res.code(400);
@@ -171,7 +171,9 @@ app.get("/send", async (req, res) => {
 
         try {
             await sock.sendMessage(getJid(req), {
-                document: await response.arrayBuffer(),
+                document: {
+                    stream: Readable.fromWeb(response.body as ReadableStream)
+                },
                 fileName: fileName,
                 caption: message
             });
