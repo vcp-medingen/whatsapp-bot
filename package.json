@@ -1,0 +1,9 @@
+{
+  "name": "vcpmed-wa",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc10",
+    "express": "^5.2.1"
+  }
+}
