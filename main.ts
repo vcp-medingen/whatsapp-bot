@@ -11,6 +11,8 @@ import NodeCache from "@cacheable/node-cache";
 import { toString } from "qrcode";
 import Fastify, {type FastifyRequest} from "fastify";
 import { configDotenv } from "dotenv";
+import { Readable } from "node:stream";
+import { type ReadableStream } from "node:stream/web";
 
 configDotenv();
 
@@ -155,14 +157,32 @@ app.get("/send", async (req, res) => {
                 "error": "Missing query parameters"
             };
         }
+
+        // Fetch file as readable stream
+        const response = await fetch(mediaUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3' } });
+
+        if (!response.ok || !response.body) {
+            res.code(400);
+            return {
+                "status": "error",
+                "error": "No url with downloadable file provided"
+            };
+        }
+
         try {
             await sock.sendMessage(getJid(req), {
                 document: {
-                    url: mediaUrl,
+                    stream: Readable.fromWeb(response.body as ReadableStream),
                 },
                 fileName: fileName,
                 caption: message
             });
+
+            res.code(200);
+            return {
+                "status": "success",
+            };
+
         } catch (e) {
             res.code(400);
             return {
