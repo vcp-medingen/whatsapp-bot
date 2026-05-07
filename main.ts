@@ -9,7 +9,7 @@ import makeWASocket, {
 import { pino } from "pino";
 import NodeCache from "@cacheable/node-cache";
 import { toString } from "qrcode";
-import Fastify, {FastifyRequest} from "fastify";
+import Fastify, {type FastifyRequest} from "fastify";
 import { configDotenv } from "dotenv";
 
 configDotenv();
