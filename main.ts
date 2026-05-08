@@ -11,8 +11,6 @@ import NodeCache from "@cacheable/node-cache";
 import { toString } from "qrcode";
 import Fastify, {type FastifyRequest} from "fastify";
 import { configDotenv } from "dotenv";
-import { Readable } from "node:stream";
-import { type ReadableStream } from "node:stream/web";
 
 configDotenv();
 
@@ -99,7 +97,9 @@ function getJid(req: FastifyRequest): string {
     return prodJid;
 }
 
-const app = Fastify();
+const app = Fastify({
+    bodyLimit: 2147000000,
+});
 
 app.get("/send", async (req, res) => {
 
@@ -135,7 +135,7 @@ app.get("/send", async (req, res) => {
     if (!mediaUrl) {
         try {
             console.log(message);
-            await sock.sendMessage("120363370055424747@g.us", {
+            await sock.sendMessage(getJid(req), {
                 text: message
             });
         } catch (e) {
@@ -158,22 +158,88 @@ app.get("/send", async (req, res) => {
             };
         }
 
-        // Fetch file as readable stream
-        const response = await fetch(mediaUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3' } , redirect: "follow"});
+        try {
+            await sock.sendMessage(getJid(req), {
+                document: {
+                    url: mediaUrl,
+                },
+                fileName: fileName,
+                caption: message
+            });
 
-        if (!response.ok || !response.body) {
+            res.code(200);
+            return {
+                "status": "success",
+            };
+
+        } catch (e) {
             res.code(400);
             return {
                 "status": "error",
-                "error": "No url with downloadable file provided"
+                "error": e
+            }
+        }
+    }
+})
+
+app.post("/send", async (req, res) => {
+
+    if (apiKey && req.query.api_key != apiKey) {
+        res.code(401);
+        return {
+            "status": "error",
+            "error": "API Key is incorrect"
+        }
+    }
+
+    const message: string | undefined = req.query.message;
+    const fileName: string | undefined = req.query.file_name;
+
+
+    if (!message && !req.body.file) {
+        res.code(400);
+        return {
+            "status": "error",
+            "error": "Missing query parameters/file upload"
+        };
+    }
+
+    if (sock === undefined || sockStatus != "open") {
+        res.code(500);
+        return {
+            "status": "error",
+            "error": "WhatsApp Bot is offline"
+        };
+    }
+
+    if (!req.body.file) {
+        try {
+            await sock.sendMessage(getJid(req), {
+                text: message
+            });
+        } catch (e) {
+            res.code(400);
+            return {
+                "status": "error",
+                "error": e
+            }
+        }
+        res.code(200);
+        return {
+            "status": "success"
+        };
+    } else {
+        if (!fileName) {
+            res.code(400);
+            return {
+                "status": "error",
+                "error": "Missing query parameters"
             };
         }
 
         try {
             await sock.sendMessage(getJid(req), {
-                document: {
-                    stream: Readable.fromWeb(response.body as ReadableStream)
-                },
+                document: Buffer.from(req.body.file as string, "base64"),
                 fileName: fileName,
                 caption: message
             });
