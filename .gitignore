@@ -144,3 +144,4 @@ vite.config.ts.timestamp-*
 
 wa-logs.txt
 baileys_auth_info
+test.http

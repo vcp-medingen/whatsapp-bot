@@ -59,7 +59,8 @@ async function startSock() {
             console.log(await toString(update.qr, {type: "terminal"}))
         }
 
-        if (update.connection === "close" && (update.lastDisconnect?.error)?.output?.statusCode === DisconnectReason.restartRequired) {
+        if (update.connection === "close") {
+            // && (update.lastDisconnect?.error)?.output?.statusCode === DisconnectReason.restartRequired
             await startSock();
         }
 
@@ -429,6 +430,21 @@ app.get("/change-description", async (req, res) => {
     return {
         "status": "success"
     };
+})
+
+app.get("/health", async (req, res) => {
+    if (sock === undefined || sockStatus != "open") {
+        res.code(500);
+        return {
+            "status": "error",
+            "error": "WhatsApp Bot is offline"
+        };
+    } else {
+        res.code(200);
+        return {
+            "status": "online"
+        };
+    }
 })
 
 app.listen({
