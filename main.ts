@@ -11,6 +11,7 @@ import NodeCache from "@cacheable/node-cache";
 import { toString } from "qrcode";
 import Fastify, {type FastifyRequest} from "fastify";
 import { configDotenv } from "dotenv";
+import { fileTypeFromBuffer } from "file-type";
 
 configDotenv();
 
@@ -239,10 +240,12 @@ app.post("/send", async (req, res) => {
         }
 
         try {
+            const fileBuffer = Buffer.from(req.body.file as string, "base64");
             await sock.sendMessage(getJid(req), {
-                document: Buffer.from(req.body.file as string, "base64"),
+                document: fileBuffer,
                 fileName: fileName,
-                caption: message
+                caption: message,
+                mimetype: fileTypeFromBuffer(fileBuffer),
             });
 
             res.code(200);

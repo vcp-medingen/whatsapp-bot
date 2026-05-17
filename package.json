@@ -6,6 +6,7 @@
     "@whiskeysockets/baileys": "^7.0.0-rc10",
     "dotenv": "^17.4.2",
     "fastify": "^5.8.5",
+    "file-type": "^22.0.1",
     "link-preview-js": "^4.0.1",
     "node-cache": "^5.1.2",
     "pino": "^10.3.1",
