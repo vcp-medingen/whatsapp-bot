@@ -440,7 +440,11 @@ app.get("/health", async (req, res) => {
         res.code(500);
         return {
             "status": "error",
-            "error": "WhatsApp Bot is offline"
+            "error": "WhatsApp Bot is offline",
+            "details": {
+                "sockIsUndefined": sock === undefined,
+                "sockStatus": sockStatus,
+            }
         };
     } else {
         res.code(200);
