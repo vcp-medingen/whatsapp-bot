@@ -1,7 +1,6 @@
 import type { CacheStore } from "@whiskeysockets/baileys";
 import makeWASocket, {
     Browsers,
-    DisconnectReason,
     makeCacheableSignalKeyStore,
     useMultiFileAuthState,
     type WAMessage
@@ -55,7 +54,9 @@ async function startSock() {
     });
 
     sock.ev.on("connection.update", async (update) => {
-        sockStatus = update.connection;
+        if (update.connection) {
+            sockStatus = update.connection;
+        }
         if (update.qr) {
             console.log(await toString(update.qr, {type: "terminal"}))
         }
