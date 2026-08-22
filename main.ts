@@ -49,8 +49,7 @@ async function startSock() {
         },
         generateHighQualityLinkPreview: true,
         cachedGroupMetadata: async (jid) => groupMetadataCache.get(jid),
-        shouldSyncHistoryMessage: () => false,
-        browser: Browsers.macOS("Desktop")
+        shouldSyncHistoryMessage: () => false
     });
 
     sock.ev.on("connection.update", async (update) => {
