@@ -242,11 +242,12 @@ app.post("/send", async (req, res) => {
 
         try {
             const fileBuffer = Buffer.from(req.body.file as string, "base64");
+            const mimetype = await fileTypeFromBuffer(fileBuffer)
             await sock.sendMessage(getJid(req), {
                 document: fileBuffer,
                 fileName: fileName,
                 caption: message,
-                mimetype: fileTypeFromBuffer(fileBuffer),
+                mimetype: mimetype?.mime.includes("pdf") ? undefined : mimetype?.mime,
             });
 
             res.code(200);
